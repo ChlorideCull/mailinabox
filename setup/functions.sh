@@ -163,7 +163,7 @@ function input_menu {
 }
 
 function input_checklist {
-	# input_checklist "title" "prompt" "tag item tag item" VARIABLE
+	# input_checklist "title" "prompt" "tag item status tag item status" VARIABLE
 	# The user's input will be stored in the variable VARIABLE as quoted strings.
 	# The exit code from dialog will be stored in VARIABLE_EXITCODE.
 	declare -n result=$4
