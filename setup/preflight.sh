@@ -30,6 +30,9 @@ if [ ! -d /vagrant ]; then
 	echo "Your Mail-in-a-Box needs more memory (RAM) to function properly."
 	echo "Please provision a machine with at least 768 MB, 1 GB recommended."
 	echo "This machine has $TOTAL_PHYSICAL_MEM MB memory."
-	exit
+	read -n 1 -p "Do you wish to continue on your own risk? This is only recommended for advanced Linux sysadmins. [y/n] " IGNORE_MEM
+	if [ "$IGNORE_MEM" -ne "y"]; then
+		exit
+	fi
 fi
 fi
