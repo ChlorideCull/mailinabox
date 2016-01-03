@@ -173,6 +173,21 @@ function input_checklist {
 	result_code=$?
 }
 
+function checklist_is_selected {
+	# checklist_is_selected "${array[@]}" "tag" VARIABLE
+	# Outputs "on" if the tag is present in the array, otherwise outputs "off"
+	# Output will be stored in the variable VARIABLE.
+	# Caveats:
+	#  * It doesn't handle spaces that well in "tag" or the array entries
+	declare -n result=$3
+	declare -n result_code=$3_EXITCODE
+	if [[ " $1 " =~ " $2 " ]]; then
+		result="on"
+	else
+		result="off"
+	fi
+}
+
 function wget_verify {
 	# Downloads a file from the web and checks that it matches
 	# a provided hash. If the comparison fails, exit immediately.
