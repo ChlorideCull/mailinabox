@@ -162,6 +162,17 @@ function input_menu {
 	result_code=$?
 }
 
+function input_checklist {
+	# input_checklist "title" "prompt" "tag item tag item" VARIABLE
+	# The user's input will be stored in the variable VARIABLE as quoted strings.
+	# The exit code from dialog will be stored in VARIABLE_EXITCODE.
+	declare -n result=$4
+	declare -n result_code=$4_EXITCODE
+	local IFS=^$'\n'
+	result=$(dialog --stdout --title "$1" --checklist "$2" 0 0 0 $3)
+	result_code=$?
+}
+
 function wget_verify {
 	# Downloads a file from the web and checks that it matches
 	# a provided hash. If the comparison fails, exit immediately.
