@@ -50,10 +50,10 @@ if [ $SELECTED_COMPONENTS -ne 0 ]; then
 	"CONTACTS \"ownCloud - Offers contact management (CardDAV/CalDAV).\" $I_CONTACTS \
 	ZPUSH \"Z-Push - Offers ActiveSync integration.\" $I_ZPUSH \
 	WEBMAIL \"RoundCube - Rich webmail client.\" $I_WEBMAIL \
-	MONITORING \"Munin - Monitoring service, to easily keep an eye on the health of the server.\" $I_MONITORING \
-	BACKUPS \"duplicity - Efficient encrypted backups\" $I_BACKUPS" \
+	MONITORING \"Munin - Monitoring service, to easily keep an eye on the health of the server.\" $I_MONITORING" \
 	SelectedInstall
-	INSTALL_LIST=("SMTP_IMAP" "ANTISPAM" "DNS" $SelectedInstall)
+    # The first four are currently not optional.
+	INSTALL_LIST=("SMTP_IMAP" "ANTISPAM" "DNS" "BACKUPS" $SelectedInstall)
 fi
 
 # The box needs a name.
