@@ -51,10 +51,9 @@ if [ $SELECTED_COMPONENTS -ne 0 ]; then
 	ZPUSH \"Z-Push - Offers ActiveSync integration.\" $I_ZPUSH \
 	WEBMAIL \"RoundCube - Rich webmail client.\" $I_WEBMAIL \
 	MONITORING \"Munin - Monitoring service, to easily keep an eye on the health of the server.\" $I_MONITORING \
-	DNS \"nsd4 - DNS server\" $I_DNS \
 	BACKUPS \"duplicity - Efficient encrypted backups\" $I_BACKUPS" \
 	SelectedInstall
-	INSTALL_LIST=("SMTP_IMAP" "ANTISPAM" $SelectedInstall)
+	INSTALL_LIST=("SMTP_IMAP" "ANTISPAM" "DNS" $SelectedInstall)
 fi
 
 # The box needs a name.
