@@ -21,6 +21,48 @@ if [ -z "$NONINTERACTIVE" ]; then
 		\n\nTo change your answers later, just run 'sudo mailinabox' from the command line."
 fi
 
+# Do we have an install? If not, preselect everything.
+if [ -z "$INSTALL_LIST" ]; then
+	SELECTED_COMPONENTS=1
+	INSTALL_LIST=("SMTP_IMAP" "CONTACTS" "ZPUSH" "WEBMAIL" "ANTISPAM" "MONITORING" "DNS" "BACKUPS")
+fi
+
+# Show the component select menu, which updates INSTALL_LIST.
+if [ $SELECTED_COMPONENTS -ne 0 ]; then
+	SELECTED_COMPONENTS=0
+	local I_SMTP_IMAP
+	local I_CONTACTS
+	local I_ZPUSH
+	local I_WEBMAIL
+	local I_ANTISPAM
+	local I_MONITORING
+	local I_DNS
+	local I_BACKUPS
+	checklist_is_selected "${INSTALL_LIST[@]}" "SMTP_IMAP" I_SMTP_IMAP
+	checklist_is_selected "${INSTALL_LIST[@]}" "CONTACTS" I_CONTACTS
+	checklist_is_selected "${INSTALL_LIST[@]}" "ZPUSH" I_ZPUSH
+	checklist_is_selected "${INSTALL_LIST[@]}" "WEBMAIL" I_WEBMAIL
+	checklist_is_selected "${INSTALL_LIST[@]}" "ANTISPAM" I_ANTISPAM
+	checklist_is_selected "${INSTALL_LIST[@]}" "MONITORING" I_MONITORING
+	checklist_is_selected "${INSTALL_LIST[@]}" "DNS" I_DNS
+	checklist_is_selected "${INSTALL_LIST[@]}" "BACKUPS" I_BACKUPS
+	local SelectedInstall #Viewable by the called function
+	input_checklist "Select Components" \
+	"If you don't need something, you can skip installing it to save some space.
+	\nIf you're unsure, just hit Enter to continue. Hit space to select and unselect." \
+	\
+	"SMTP_IMAP \"Dovecot and PostFix - Basic Mail-server solution.\" $I_SMTP_IMAP \
+	CONTACTS \"ownCloud - Offers contact management (CardDAV/CalDAV).\" $I_CONTACTS \
+	ZPUSH \"Z-Push - Offers ActiveSync integration.\" $I_ZPUSH \
+	WEBMAIL \"RoundCube - Rich webmail client.\" $I_WEBMAIL \
+	ANTISPAM \"SpamAssassin and PostGrey - AntiSpam basics (heavily recommended).\" $I_ANTISPAM \
+	MONITORING \"Munin - Monitoring service, to easily keep an eye on the health of the server.\" $I_MONITORING \
+	DNS \"nsd4 - DNS server\" $I_DNS \
+	BACKUPS \"duplicity - Efficient encrypted backups\" $I_BACKUPS" \
+	SelectedInstall
+	INSTALL_LIST=($SelectedInstall)
+fi
+
 # The box needs a name.
 if [ -z "$PRIMARY_HOSTNAME" ]; then
 	if [ -z "$DEFAULT_PRIMARY_HOSTNAME" ]; then
