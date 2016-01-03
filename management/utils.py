@@ -252,6 +252,10 @@ def fix_boto():
 	import os
 	os.environ["BOTO_CONFIG"] = "/etc/boto3.cfg"
 
+def get_installed_components():
+    bashstring = load_environment()["INSTALL_LIST"]
+    basharray = bashstring.split(None) # Ignores multiple spaces in a row, see docs
+    return basharray[1:-1] # Removes the stray parentheses 
 
 if __name__ == "__main__":
 	from web_update import get_web_domains

@@ -7,7 +7,7 @@ import os.path, re, rtyaml
 from mailconfig import get_mail_domains
 from dns_update import get_custom_dns_config, get_dns_zones
 from ssl_certificates import get_ssl_certificates, get_domain_ssl_files, check_certificate
-from utils import shell, safe_domain_name, sort_domains
+from utils import shell, safe_domain_name, sort_domains, get_installed_components
 
 def get_web_domains(env, include_www_redirects=True):
 	# What domains should we serve HTTP(S) for?
@@ -68,13 +68,28 @@ def do_web_update(env):
 	nginx_conf = open(os.path.join(os.path.dirname(__file__), "../conf/nginx-top.conf")).read()
 
 	# Load the templates.
-	template0 = open(os.path.join(os.path.dirname(__file__), "../conf/nginx.conf")).read()
-	template1 = open(os.path.join(os.path.dirname(__file__), "../conf/nginx-alldomains.conf")).read()
-	template2 = open(os.path.join(os.path.dirname(__file__), "../conf/nginx-primaryonly.conf")).read()
-	template3 = "\trewrite ^(.*) https://$REDIRECT_DOMAIN$1 permanent;\n"
+	template_base = open(os.path.join(os.path.dirname(__file__), "../conf/nginx.conf")).read()
+	template_base_alldomains = open(os.path.join(os.path.dirname(__file__), "../conf/nginx-alldomains.conf")).read()
+	template_base_primaryonly = open(os.path.join(os.path.dirname(__file__), "../conf/nginx-primaryonly.conf")).read()
+	template_base_wwwredirect = "\trewrite ^(.*) https://$REDIRECT_DOMAIN$1 permanent;\n"
+    template0 = [ template_base ]
+    template1 = [ template_base_alldomains ]
+    template2 = [ template_base_primaryonly ]
+    template3 = [ template_base_wwwredirect ]
+    
+    # Add configurations to template if they are installed
+    installed_cpnts = get_installed_components()
+    if "WEBMAIL" in installed_cpnts:
+        template1 += [ open(os.path.join(os.path.dirname(__file__), "../conf/nginx-alldomains-roundcube.conf")).read() ]
+    if "CONTACTS" in installed_cpnts:
+        template2 += [ open(os.path.join(os.path.dirname(__file__), "../conf/nginx-primaryonly-owncloud.conf")).read() ]
+    if "ZPUSH" in installed_cpnts:
+        template1 += [ open(os.path.join(os.path.dirname(__file__), "../conf/nginx-alldomains-zpush.conf")).read() ]
+    if "MONITORING" in installed_cpnts:
+        template2 += [ open(os.path.join(os.path.dirname(__file__), "../conf/nginx-primaryonly-munin.conf")).read() ]
 
 	# Add the PRIMARY_HOST configuration first so it becomes nginx's default server.
-	nginx_conf += make_domain_config(env['PRIMARY_HOSTNAME'], [template0, template1, template2], ssl_certificates, env)
+	nginx_conf += make_domain_config(env['PRIMARY_HOSTNAME'], template0 + template1 + template2, ssl_certificates, env)
 
 	# Add configuration all other web domains.
 	has_root_proxy_or_redirect = get_web_domains_with_root_overrides(env)
@@ -86,12 +101,12 @@ def do_web_update(env):
 		if domain in web_domains_not_redirect:
 			# This is a regular domain.
 			if domain not in has_root_proxy_or_redirect:
-				nginx_conf += make_domain_config(domain, [template0, template1], ssl_certificates, env)
+				nginx_conf += make_domain_config(domain, template0 + template1, ssl_certificates, env)
 			else:
-				nginx_conf += make_domain_config(domain, [template0], ssl_certificates, env)
+				nginx_conf += make_domain_config(domain, template0, ssl_certificates, env)
 		else:
 			# Add default 'www.' redirect.
-			nginx_conf += make_domain_config(domain, [template0, template3], ssl_certificates, env)
+			nginx_conf += make_domain_config(domain, template0 + template3, ssl_certificates, env)
 
 	# Did the file change? If not, don't bother writing & restarting nginx.
 	nginx_conf_fn = "/etc/nginx/conf.d/local.conf"

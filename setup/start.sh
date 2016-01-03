@@ -89,23 +89,37 @@ PUBLIC_IP=$PUBLIC_IP
 PUBLIC_IPV6=$PUBLIC_IPV6
 PRIVATE_IP=$PRIVATE_IP
 PRIVATE_IPV6=$PRIVATE_IPV6
+INSTALL_LIST=( ${INSTALL_LIST[*]} )
+SELECTED_COMPONENTS=$SELECTED_COMPONENTS
 EOF
 
 # Start service configuration.
 source setup/system.sh
 source setup/ssl.sh
-source setup/dns.sh
-source setup/mail-postfix.sh
-source setup/mail-dovecot.sh
-source setup/mail-users.sh
-source setup/dkim.sh
-source setup/spamassassin.sh
+if [[ " ${INSTALL_LIST[@]} " =~ " DNS " ]]; then
+	source setup/dns.sh
+fi
+if [[ " ${INSTALL_LIST[@]} " =~ " SMTP_IMAP " ]]; then
+	source setup/mail-postfix.sh
+	source setup/mail-dovecot.sh
+	source setup/mail-users.sh
+	source setup/dkim.sh
+	source setup/spamassassin.sh
+fi
 source setup/web.sh
-source setup/webmail.sh
-source setup/owncloud.sh
-source setup/zpush.sh
+if [[ " ${INSTALL_LIST[@]} " =~ " WEBMAIL " ]]; then
+	source setup/webmail.sh
+fi
+if [[ " ${INSTALL_LIST[@]} " =~ " CONTACTS " ]]; then
+	source setup/owncloud.sh
+fi
+if [[ " ${INSTALL_LIST[@]} " =~ " ZPUSH " ]]; then
+	source setup/zpush.sh
+fi
 source setup/management.sh
-source setup/munin.sh
+if [[ " ${INSTALL_LIST[@]} " =~ " MONITORING " ]]; then
+	source setup/munin.sh
+fi
 
 # Ping the management daemon to write the DNS and nginx configuration files.
 until nc -z -w 4 localhost 10222
