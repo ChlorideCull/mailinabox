@@ -6,7 +6,7 @@
 #    directory STORAGE_ROOT/backup/encrypted. The password used for
 #    encryption is stored in backup/secret_key.txt.
 # 3) The stopped services are restarted.
-# 5) STORAGE_ROOT/backup/after-backup is executd if it exists.
+# 5) STORAGE_ROOT/backup/after-backup is executed if it exists.
 
 import os, os.path, shutil, glob, re, datetime
 import dateutil.parser, dateutil.relativedelta, dateutil.tz
@@ -183,7 +183,7 @@ def perform_backup(full_backup):
 	backup_cache_dir = os.path.join(backup_root, 'cache')
 	backup_dir = os.path.join(backup_root, 'encrypted')
 
-	# Are backups dissbled?
+	# Are backups disabled?
 	if config["target"] == "off":
 		return
 
